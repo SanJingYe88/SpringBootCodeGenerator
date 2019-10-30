@@ -1,9 +1,7 @@
 package com.softdev.system.generator.util;
 
 
-import com.softdev.system.generator.entity.ClassInfo;
-import com.softdev.system.generator.entity.CreateInfo;
-import com.softdev.system.generator.entity.FieldInfo;
+import com.softdev.system.generator.entity.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -27,6 +25,10 @@ public class TableParseUtil {
      * @return 返回实体类
      */
     public static ClassInfo processTableIntoClassInfo(CreateInfo createInfo) {
+
+        ClassInfo classInfo = new ClassInfo();
+        TableInfo tableInfo = new TableInfo();
+
         String tableSql = createInfo.getTableSql();
         tableSql = tableSql.trim()
                 .replaceAll("'", "`")
@@ -34,8 +36,8 @@ public class TableParseUtil {
                 .replaceAll("\n","")
                 .replaceAll("\t","")
                 .trim().toLowerCase();          //注意:sql 现在全是小写的了
-        createInfo.setTableSql(tableSql);
         log.info("tableSql:{}",tableSql);
+        createInfo.setTableSql(tableSql);
 
         // 解析出表名
         String tableName = TableParseUtil.parseTableName(tableSql);
@@ -43,19 +45,21 @@ public class TableParseUtil {
         if (StringUtils.isNullOrEmpty(tableName)){
             throw new CodeGenerateException("表名解析失败,请检查SQL语句.");
         }
-
+        tableInfo.setTableName(tableName);
         tableSql = tableSql.substring(tableSql.indexOf("(") + 1).trim();
-        createInfo.setTableSql(tableSql);
 
         // 通过表名得到类名
         String className = TableParseUtil.parseClassName(tableName);
         if (StringUtils.isNullOrEmpty(className)){
             throw new CodeGenerateException("类名解析失败.");
         }
+        classInfo.setClassName(className);
 
         // 通过表名注释解析出类名注释
         String classComment = TableParseUtil.parseClassComment(className,createInfo);
         log.info("解析出类名注释:{}",classComment);
+        classInfo.setClassComment(classComment);
+        tableInfo.setTableComment(classComment);
 
         if(!className.equals(classComment)){     //如果有表注释
             tableSql = tableSql.substring(0,tableSql.lastIndexOf("comment")).trim();
@@ -70,176 +74,14 @@ public class TableParseUtil {
             throw new CodeGenerateException("表结构分析失败，请检查语句或者提交issue给我");
         }
 
-        ClassInfo codeJavaInfo = new ClassInfo();
-        codeJavaInfo.setTableName(tableName);
-        codeJavaInfo.setClassName(className);
-        codeJavaInfo.setClassComment(classComment);
-        codeJavaInfo.setFieldList(fieldList);
-
-        return codeJavaInfo;
-    }
-
-    /**
-     * 通过表结构,解析出属性
-     * @param createInfo 生成条件
-     * @return 属性列表
-     */
-    private static List<FieldInfo> parseFieldInfo1(CreateInfo createInfo) {
-        List<FieldInfo> fieldList = new ArrayList<>();     //属性列表
-        String tableSql = createInfo.getTableSql();
-
-        // 正常的 sql 建表语句中 ( ) 内的一定是字段相关的定义
-        String fieldListTmp = tableSql.substring(tableSql.indexOf("(") + 1, tableSql.lastIndexOf(")"));
-
-        // 对 字段注释 comment 中有英文逗号的特殊情况的处理, 防止不小心被当成切割符号切割
-        fieldListTmp = TableParseUtil.changeFieldComment(fieldListTmp);
-
-        // 对 double(10, 2) 等类型中有英文逗号的特殊情况的处理, 防止不小心被当成切割符号切割
-        fieldListTmp = TableParseUtil.changeFieldType(fieldListTmp);
-
-        // 不相干的英文逗号处理完毕,进行字段的切分
-        String[] fieldLineList = fieldListTmp.split(",");
-        if (fieldLineList.length > 0) {
-            int i = 0;
-            //i为了解决primary key关键字出现的地方，出现在前3行，一般和id有关
-            for (String columnLine : fieldLineList) {
-                i++;
-                columnLine = columnLine.replaceAll("\n", "").replaceAll("\t", "").trim();
-                // `userid` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-                // 2018-9-18 zhengk 修改为contains，提升匹配率和匹配不按照规矩出牌的语句
-                // 2018-11-8 zhengkai 修复tornadoorz反馈的KEY FK_permission_id (permission_id),KEY FK_role_id (role_id)情况
-                // 2019-2-22 zhengkai 要在条件中使用复杂的表达式
-                // 2019-4-29 zhengkai 优化对普通和特殊storage关键字的判断（感谢@AhHeadFloating的反馈 ）
-                boolean specialFlag = (!columnLine.contains("key ") && !columnLine.contains("constraint") && !columnLine.contains("using") && !columnLine.contains("unique")
-                        && !(columnLine.contains("primary") && columnLine.indexOf("storage") + 3 > columnLine.indexOf("("))
-                        && !columnLine.contains("pctincrease")
-                        && !columnLine.contains("buffer_pool") && !columnLine.contains("tablespace")
-                        && !(columnLine.contains("primary") && i > 3));
-
-                if (specialFlag) {
-                    //如果是oracle的number(x,x)，可能出现最后分割残留的,x)，这里做排除处理
-                    if (columnLine.length() < 5) {
-                        continue;
-                    }
-                    //2018-9-16 zhengkai 支持'符号以及空格的oracle语句// userid` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-                    String columnName = "";
-                    columnLine = columnLine.replaceAll("`", " ").replaceAll("\"", " ").replaceAll("'", "").replaceAll("  ", " ").trim();
-                    //如果遇到username varchar(65) default '' not null,这种情况，判断第一个空格是否比第一个引号前
-                    columnName = columnLine.substring(0, columnLine.indexOf(" "));
-
-                    // field Name
-//                    2019-09-08 yj 添加是否下划线转换为驼峰的判断
-                    String fieldName;
-                    if (createInfo.isCanUnderLineToCamelCase()) {
-                        fieldName = StringUtils.lowerCaseFirst(StringUtils.underlineToCamelCase(columnName));
-                        if (fieldName.contains("_")) {
-                            fieldName = fieldName.replaceAll("_", "");
-                        }
-                    } else {
-                        fieldName = StringUtils.lowerCaseFirst(columnName);
-                    }
-
-                    // field class
-                    columnLine = columnLine.substring(columnLine.indexOf("`") + 1).trim();
-                    // int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-                    String fieldClass = Object.class.getSimpleName();
-                    //2018-9-16 zhengk 补充char/clob/blob/json等类型，如果类型未知，默认为String
-                    //2018-11-22 lshz0088 处理字段类型的时候，不严谨columnLine.contains(" int") 类似这种的，可在前后适当加一些空格之类的加以区分，否则当我的字段包含这些字符的时候，产生类型判断问题。
-                    if (columnLine.contains(" int") || columnLine.contains("smallint")) {
-                        fieldClass = Integer.class.getSimpleName();
-                    } else if (columnLine.contains("bigint")) {
-                        fieldClass = Long.class.getSimpleName();
-                    } else if (columnLine.contains("float")) {
-                        fieldClass = Float.class.getSimpleName();
-                    } else if (columnLine.contains("double")) {
-                        fieldClass = Double.class.getSimpleName();
-                    } else if (columnLine.contains("datetime") || columnLine.contains("timestamp")) {
-                        fieldClass = Date.class.getSimpleName();
-                    } else if (columnLine.contains("varchar") || columnLine.contains(" text") || columnLine.contains("char")
-                            || columnLine.contains("clob") || columnLine.contains("blob") || columnLine.contains("json")) {
-                        fieldClass = String.class.getSimpleName();
-                    } else if (columnLine.contains("decimal") || columnLine.contains(" number")) {
-                        //2018-11-22 lshz0088 建议对number类型增加int，long，BigDecimal的区分判断
-                        //如果startKh大于等于0，则表示有设置取值范围
-                        int startKh = columnLine.indexOf("(");
-                        if (startKh >= 0) {
-                            int endKh = columnLine.indexOf(")", startKh);
-                            String[] fanwei = columnLine.substring(startKh + 1, endKh).split("，");
-                            //2019-1-5 zhengk 修复@arthaschan反馈的超出范围错误
-                            //System.out.println("fanwei"+ JSON.toJSONString(fanwei));
-                            //                            //number(20,6) fanwei["20","6"]
-                            //                            //number(0,6) fanwei["0","6"]
-                            //                            //number(20,0) fanwei["20","0"]
-                            //                            //number(20) fanwei["20"]
-                            //如果括号里是1位或者2位且第二位为0，则进行特殊处理。只有有小数位，都设置为BigDecimal。
-                            if ((fanwei.length > 1 && "0".equals(fanwei[1])) || fanwei.length == 1) {
-                                int length = Integer.parseInt(fanwei[0]);
-                                if (fanwei.length > 1) {
-                                    length = Integer.valueOf(fanwei[1]);
-                                }
-                                //数字范围9位及一下用Integer，大的用Long
-                                if (length <= 9) {
-                                    fieldClass = Integer.class.getSimpleName();
-                                } else {
-                                    fieldClass = Long.class.getSimpleName();
-                                }
-                            } else {
-                                //有小数位数一律使用BigDecimal
-                                fieldClass = BigDecimal.class.getSimpleName();
-                            }
-                        } else {
-                            fieldClass = BigDecimal.class.getSimpleName();
-                        }
-                    } else if (columnLine.contains("boolean") || columnLine.contains("tinyint")) {
-                        //20190910 MOSHOW.K.ZHENG 新增对boolean的处理（感谢@violinxsc的反馈）以及修复tinyint类型字段无法生成boolean类型问题（感谢@hahaYhui的反馈）
-                        fieldClass = Boolean.class.getSimpleName();
-                    } else {
-                        fieldClass = String.class.getSimpleName();
-                    }
-
-                    // field comment，MySQL的一般位于field行，而pgsql和oralce多位于后面。
-                    String fieldComment = null;
-                    if (tableSql.contains("comment on column") && (tableSql.contains("." + columnName + " is ") || tableSql.contains(".`" + columnName + "` is"))) {
-                        //新增对pgsql/oracle的字段备注支持
-                        //COMMENT ON COLUMN public.check_info.check_name IS '检查者名称';
-                        //2018-11-22 lshz0088 正则表达式的点号前面应该加上两个反斜杠，否则会认为是任意字符
-                        //2019-4-29 zhengkai 优化对oracle注释comment on column的支持（@liukex）
-                        tableSql = tableSql.replaceAll(".`" + columnName + "` is", "." + columnName + " is");
-                        Matcher columnCommentMatcher = Pattern.compile("\\." + columnName + " is `").matcher(tableSql);
-                        fieldComment = columnName;
-                        while (columnCommentMatcher.find()) {
-                            String columnCommentTmp = columnCommentMatcher.group();
-                            System.out.println(columnCommentTmp);
-                            fieldComment = tableSql.substring(tableSql.indexOf(columnCommentTmp) + columnCommentTmp.length()).trim();
-                            fieldComment = fieldComment.substring(0, fieldComment.indexOf("`")).trim();
-                        }
-                    } else if (columnLine.contains("comment")) {
-                        String commentTmp = columnLine.substring(columnLine.indexOf("comment") + 7).trim();
-                        // '用户ID',
-                        if (commentTmp.contains("`") || commentTmp.indexOf("`") != commentTmp.lastIndexOf("`")) {
-                            commentTmp = commentTmp.substring(commentTmp.indexOf("`") + 1, commentTmp.lastIndexOf("`"));
-                        }
-                        //解决最后一句是评论，无主键且连着)的问题:album_id int(3) default '1' null comment '相册id：0 代表头像 1代表照片墙')
-                        if (commentTmp.contains(")")) {
-                            commentTmp = commentTmp.substring(0, commentTmp.lastIndexOf(")") + 1);
-                        }
-                        fieldComment = commentTmp;
-                    } else {
-                        //修复comment不存在导致报错的问题
-                        fieldComment = columnName;
-                    }
-
-                    FieldInfo fieldInfo = new FieldInfo();
-                    fieldInfo.setColumnName(columnName);
-                    fieldInfo.setFieldName(fieldName);
-                    fieldInfo.setFieldClass(fieldClass);
-                    fieldInfo.setFieldComment(fieldComment);
-
-                    fieldList.add(fieldInfo);
-                }
-            }
+        for (FieldInfo fieldInfo : fieldList){
+            log.info("解析出的属性信息:{}",fieldInfo);
+            log.info("解析出的表字段信息:{}",fieldInfo.getColumnInfo());
         }
-        return fieldList;
+
+        classInfo.setFieldInfoList(fieldList);
+        classInfo.setTableInfo(tableInfo);
+        return classInfo;
     }
 
     /**
@@ -273,25 +115,34 @@ public class TableParseUtil {
         List<FieldInfo> fieldList = new ArrayList<>();     //属性列表
         String tableSql = createInfo.getTableSql();
 
-        String fieldListTmp = tableSql;
-
         // 对 字段注释 comment 中有英文逗号的特殊情况的处理, 防止不小心被当成切割符号切割
-        fieldListTmp = TableParseUtil.changeFieldComment(fieldListTmp);
+        tableSql = TableParseUtil.changeFieldComment(tableSql);
 
         // 对 double(10, 2) 等类型中有英文逗号的特殊情况的处理, 防止不小心被当成切割符号切割
-        fieldListTmp = TableParseUtil.changeFieldType(fieldListTmp);
+        tableSql = TableParseUtil.changeFieldType(tableSql);
+
+        // 对 联合主键 中有英文逗号的特殊情况的处理, 防止不小心被当成切割符号切割
+        tableSql = TableParseUtil.changeMorePrimary(tableSql);
 
         // 不相干的英文逗号处理完毕,进行字段的切分
-        String[] fieldLineList = fieldListTmp.split(",");
+        String[] fieldLineList = tableSql.split(",");
+
         if (fieldLineList.length > 0) {
 
+            String primaryColumn = "";          //可能是主键的字段, 支持联合主键
+
             for (String columnLine : fieldLineList) {
-                FieldInfo fieldInfo = new FieldInfo();
+                FieldInfo fieldInfo = new FieldInfo();      //属性
+                ColumnInfo columnInfo = new ColumnInfo();   //字段
+
                 columnLine = columnLine.trim();
 
                 // 对于一些特殊语句的处理.
-                if (columnLine.contains("primary key (") || columnLine.contains("primary key(")){
-                    continue;
+                if (primaryColumn.trim().length() == 0){
+                    if (columnLine.contains("primary key (") || columnLine.contains("primary key(")){
+                        primaryColumn = columnLine.substring(columnLine.indexOf("(") + 1, columnLine.lastIndexOf(")")).trim();
+                        continue;
+                    }
                 }
 
                 //`user_id` int(11) not null auto_increment comment `用户id`
@@ -305,6 +156,7 @@ public class TableParseUtil {
                 }else {
                     fieldInfo.setFieldComment("");
                 }
+                columnInfo.setComment(fieldInfo.getFieldComment());
 
                 //`user_id` int(11) not null auto_increment
 
@@ -313,7 +165,7 @@ public class TableParseUtil {
                     columnLine = columnLine.replaceAll("`", "").trim();
                 }
                 String columnName = columnLine.split(" ",2)[0];
-                fieldInfo.setColumnName(columnName);        //user_id
+                columnInfo.setColumnName(columnName);       //user_id
 
                 columnLine = columnLine.replace(columnName,"").trim();
 
@@ -325,68 +177,97 @@ public class TableParseUtil {
                 fieldName = StringUtils.lowerCaseFirst(fieldName);
                 fieldInfo.setFieldName(fieldName);
 
+                //int(11) not null auto_increment
+
+                String type = columnLine.split(" ",2)[0].trim();
+
+                if (type.contains("，")){        //之前转化过,现在转回来
+                    type = type.replace("，",",");
+                }
+
                 // 字段类型的处理
                 String fieldClass = String.class.getSimpleName();
-                if (columnLine.contains("int") || columnLine.contains("smallint")) {
+                if (type.startsWith("int") || type.startsWith("smallint")) {
                     fieldClass = Integer.class.getSimpleName();
-                } else if (columnLine.contains("bigint")) {
-                    fieldClass = Long.class.getSimpleName();
-                } else if (columnLine.contains("float")) {
-                    fieldClass = Float.class.getSimpleName();
-                } else if (columnLine.contains("double")) {
-                    fieldClass = Double.class.getSimpleName();
-                } else if (columnLine.contains("datetime") || columnLine.contains("timestamp")) {
-                    fieldClass = Date.class.getSimpleName();
-                } else if (columnLine.contains("varchar") || columnLine.contains("char")) {
+                } else if (type.startsWith("varchar") || type.startsWith("char")) {
                     fieldClass = String.class.getSimpleName();
-                } else if (columnLine.contains("decimal") || columnLine.contains("number")) {
-                    fieldClass = BigDecimal.class.getSimpleName();
-                } else if (columnLine.contains("boolean") || columnLine.contains("tinyint")) {
+                } else if (type.startsWith("datetime") || type.startsWith("timestamp")) {
+                    fieldClass = Date.class.getSimpleName();
+                } else if (type.startsWith("double")) {
+                    fieldClass = Double.class.getSimpleName();
+                } else if (type.startsWith("boolean") || type.startsWith("tinyint")) {
                     fieldClass = Boolean.class.getSimpleName();
+                } else if (type.startsWith("bigint")) {
+                    fieldClass = Long.class.getSimpleName();
+                } else if (type.startsWith("float")) {
+                    fieldClass = Float.class.getSimpleName();
+                } else if (type.startsWith("decimal") || type.startsWith("number")) {
+                    fieldClass = BigDecimal.class.getSimpleName();
                 } else {
                     throw new CodeGenerateException("字段类型解析失败.请检查SQL");
                 }
-                fieldInfo.setFieldClass(fieldClass);
+                columnInfo.setColumnType(type.replace("，",","));
 
-                log.info("解析出的字段信息:{}",fieldInfo);
+                columnLine = columnLine.replace(type, "");
 
-/*                boolean specialFlag = (!columnLine.contains("key ") && !columnLine.contains("constraint")
-                        && !columnLine.contains("unique")
-                        && !columnLine.contains("primary")
-                        && !(columnLine.contains("primary")));
+                //not null auto_increment
 
-                if (specialFlag) {
-                        //2018-11-22 lshz0088 建议对number类型增加int，long，BigDecimal的区分判断
-                        //如果startKh大于等于0，则表示有设置取值范围
-                        int startKh = columnLine.indexOf("(");
-                        if (startKh >= 0) {
-                            int endKh = columnLine.indexOf(")", startKh);
-                            String[] fanwei = columnLine.substring(startKh + 1, endKh).split("，");
-                            //2019-1-5 zhengk 修复@arthaschan反馈的超出范围错误
-                            //System.out.println("fanwei"+ JSON.toJSONString(fanwei));
-                            //                            //number(20,6) fanwei["20","6"]
-                            //                            //number(0,6) fanwei["0","6"]
-                            //                            //number(20,0) fanwei["20","0"]
-                            //                            //number(20) fanwei["20"]
-                            //如果括号里是1位或者2位且第二位为0，则进行特殊处理。只有有小数位，都设置为BigDecimal。
-                            if ((fanwei.length > 1 && "0".equals(fanwei[1])) || fanwei.length == 1) {
-                                int length = Integer.parseInt(fanwei[0]);
-                                if (fanwei.length > 1) {
-                                    length = Integer.valueOf(fanwei[1]);
-                                }
-                                //数字范围9位及一下用Integer，大的用Long
-                                if (length <= 9) {
-                                    fieldClass = Integer.class.getSimpleName();
-                                } else {
-                                    fieldClass = Long.class.getSimpleName();
-                                }
-                            } else {
-                                //有小数位数一律使用BigDecimal
-                                fieldClass = BigDecimal.class.getSimpleName();
-                            }*/
-                    fieldList.add(fieldInfo);
+                // 其他关键字的处理
+                if (columnLine.contains("auto_increment")){
+                    columnInfo.setPrimaryType("auto_increment");
+                    columnLine = columnLine.replace("auto_increment","");
                 }
+                if (columnLine.contains("not null")){
+                    columnInfo.setCanNull(false);
+                    columnLine = columnLine.replace("not null","");
+                }else {
+                    columnInfo.setCanNull(true);
+                }
+                if(columnLine.contains("unique")){
+                    columnInfo.setCanUnique(true);
+                    columnLine = columnLine.replace("unique","");
+                }else {
+                    columnInfo.setCanUnique(false);
+                }
+                if(columnLine.contains("primary key")){
+                    columnInfo.setCanPrimary(true);
+                    columnLine = columnLine.replace("primary key","");
+                }else {
+                    columnInfo.setCanPrimary(false);
+                }
+                if (columnLine.contains("default")){
+                    columnLine = columnLine.replace("default","").trim();
+                    columnInfo.setDefaultVaule(columnLine);
+                }
+                fieldInfo.setFieldClass(fieldClass);
+                fieldInfo.setColumnInfo(columnInfo);
+                fieldList.add(fieldInfo);
             }
+
+            // 如果是联合主键
+            primaryColumn = primaryColumn.replace("，",",");
+            if(primaryColumn.contains(",")){
+                String[] strings = primaryColumn.split(",");
+                for (String str : strings){
+                    for (FieldInfo fieldInfo : fieldList){
+                        if (fieldInfo.getColumnInfo().getColumnName().equals(str)){
+                            fieldInfo.getColumnInfo().setCanPrimary(true);
+                            fieldInfo.getColumnInfo().setCanUnique(true);
+                            break;
+                        }
+                    }
+                }
+            }else {
+                for (FieldInfo fieldInfo : fieldList){
+                    if (fieldInfo.getColumnInfo().getColumnName().equals(primaryColumn)){
+                        fieldInfo.getColumnInfo().setCanPrimary(true);
+                        fieldInfo.getColumnInfo().setCanUnique(true);
+                    }
+                }
+
+            }
+        }
+
         return fieldList;
     }
 
@@ -400,6 +281,26 @@ public class TableParseUtil {
 //                fieldListTmp = fieldListTmp.replace(matcher3.group(), commentTmpFinal);
 //            }
 //        }
+
+    /**
+     * 转换 联合主键 中可能存在的英文逗号(,) 为中文逗号(，)
+     * @param fieldListTmp 字段注释
+     * @return 字段注释
+     */
+    private static String changeMorePrimary(String fieldListTmp) {
+        if(fieldListTmp.contains("primary key(")){
+            String str = fieldListTmp.substring(fieldListTmp.indexOf("primary key("));
+            int length = str.length();
+            str = str.replace("`","").replace(",","，");
+            fieldListTmp = fieldListTmp.substring(0,fieldListTmp.length()-length) + str;
+        } else if(fieldListTmp.contains("primary key (")){
+            String str = fieldListTmp.substring(fieldListTmp.indexOf("primary key ("));
+            int length = str.length();
+            str = str.replace("`","").replace(",","，");
+            fieldListTmp = fieldListTmp.substring(0,fieldListTmp.length()-length) + str;
+        }
+        return fieldListTmp;
+    }
 
     /**
      * 转换 字段 double(10, 2) 等类型 中可能存在的英文逗号(,) 为中文逗号(，)  英文括号 () 为中文括号 （）
@@ -502,7 +403,7 @@ public class TableParseUtil {
      * @return 返回表名
      */
     private static String parseTableName(String tableSql){
-        String tableName = null;
+        String tableName = "";
 
         // 针对 create table if not exists 表名 ( ... ) 的解析
         if(tableSql.contains("if not exists")){

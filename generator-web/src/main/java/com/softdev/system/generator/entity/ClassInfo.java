@@ -16,8 +16,8 @@ import java.util.List;
 @Accessors(chain = true)
 public class ClassInfo {
 
-    private String tableName;       //所属表名
     private String className;       //类名
 	private String classComment;    //类名注释
-	private List<FieldInfo> fieldList;  //字段列表
+    private TableInfo tableInfo;    //类对应的数据表
+	private List<FieldInfo> fieldInfoList;  //字段列表
 }
