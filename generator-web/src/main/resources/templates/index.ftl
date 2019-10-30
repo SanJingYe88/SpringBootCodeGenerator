@@ -167,12 +167,12 @@
                 <div class="btn-toolbar col-md-5" role="toolbar" aria-label="Toolbar with button groups">
                     <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="btn btn-secondary disabled" id="btnGroupAddon">通用实体</div>
+                            <div class="btn btn-secondary disabled" id="btnGroupAddon">Entity</div>
                         </div>
                     </div>
                     <div class="btn-group" role="group" aria-label="First group">
-                        <button type="button" class="btn btn-default generator" id="model">entity(set/get)</button>
-                        <button type="button" class="btn btn-default generator" id="beetlentity">entity(lombok)</button>
+                        <button type="button" class="btn btn-default generator" id="entitySetGet">entity(set/get)</button>
+                        <button type="button" class="btn btn-default generator" id="entityByLombok">entity(lombok)</button>
                     </div>
                 </div>
                 <div class="btn-toolbar col-md-7" role="toolbar" aria-label="Toolbar with button groups">
