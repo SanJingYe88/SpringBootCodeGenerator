@@ -1,20 +1,23 @@
 package com.softdev.system.generator.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
 /**
- * class info
- *
- * @author xuxueli 2018-05-02 20:02:34
+ * 类的结构信息
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class ClassInfo {
 
-    private String tableName;
-    private String className;
-	private String classComment;
-	private List<FieldInfo> fieldList;
-
+    private String tableName;       //所属表名
+    private String className;       //类名
+	private String classComment;    //类名注释
+	private List<FieldInfo> fieldList;  //字段列表
 }

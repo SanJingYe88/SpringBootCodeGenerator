@@ -18,7 +18,6 @@
 		<module>generator-web</module>
 	</modules>
 
-
 	<properties>
 		<!-- 指定编码 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,64 +26,37 @@
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>1.2.60</version>
 		</dependency>
-
 		<!-- 支持 @ConfigurationProperties 注解 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-
-		<!-- spring-boot-devtools依赖包 -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
-		<!--<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<version>2.0.4.RELEASE</version>
-		</dependency>-->
-
-		<!-- spring热部署 -->
-		<!--<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>springloaded</artifactId>
-			<version>1.2.8.RELEASE</version>
-		</dependency>-->
-
 		<!-- Hutool超级工具类 http://hutool.mydoc.io/ -->
-		<!-- https://mvnrepository.com/artifact/cn.hutool/hutool-all -->
 		<dependency>
 			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-all</artifactId>
 			<version>4.6.1</version>
 		</dependency>
-
-		<!-- lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.8</version>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.8</version>
 		</dependency>
-
-		<!-- freemarker -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
@@ -111,9 +83,7 @@
 			<artifactId>activation</artifactId>
 			<version>1.1.1</version>
 		</dependency>-->
-
 	</dependencies>
-
 
 	<build>
 		<!--解决idea打包没有xml-->

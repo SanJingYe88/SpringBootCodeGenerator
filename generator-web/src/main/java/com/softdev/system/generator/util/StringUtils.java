@@ -8,6 +8,15 @@ package com.softdev.system.generator.util;
 public class StringUtils {
 
     /**
+     * 字符串不为 null 不为空
+     * @param str
+     * @return
+     */
+    public static boolean isNullOrEmpty(String str){
+        return str == null || str.trim().length() <= 0;
+    }
+
+    /**
      * 首字母大写
      *
      * @param str
@@ -30,32 +39,42 @@ public class StringUtils {
 
     /**
      * 下划线，转换为驼峰式
-     *
-     * @param underscoreName
-     * @return
+     * 不论是连续的一个下划线,还是多个下划线,都当做一个下划线处理
+     * @param underscoreName 带有下划线的字符串,需要全是小写字母
+     * @return 驼峰命名
      */
     public static String underlineToCamelCase(String underscoreName) {
-        StringBuilder result = new StringBuilder();
-        if (underscoreName != null && underscoreName.trim().length() > 0) {
-            boolean flag = false;
-            for (int i = 0; i < underscoreName.length(); i++) {
-                char ch = underscoreName.charAt(i);
-                if ("_".charAt(0) == ch) {
-                    flag = true;
-                } else {
-                    if (flag) {
-                        result.append(Character.toUpperCase(ch));
-                        flag = false;
-                    } else {
-                        result.append(ch);
-                    }
-                }
-            }
+        String result = "";
+        if (StringUtils.isNullOrEmpty(underscoreName)) {
+            throw new CodeGenerateException("转为驼峰命名时出错.输入参数 underscoreName :" + underscoreName);
         }
-        return result.toString();
+        if(!underscoreName.contains("_")){  //没有下划线,不做处理
+            return underscoreName;
+        }
+        String[] strings = underscoreName.split("_");
+        for (int i = 0; i < strings.length; i++){
+            result += StringUtils.upperCaseFirst(strings[i]);
+        }
+        return StringUtils.lowerCaseFirst(result);
     }
-
-    public static void main(String[] args) {
-
-    }
+//    public static String underlineToCamelCase(String underscoreName) {
+//        StringBuilder result = new StringBuilder();
+//        if (!StringUtils.isNullOrEmpty(underscoreName)) {
+//            boolean flag = false;
+//            for (int i = 0; i < underscoreName.length(); i++) {
+//                char ch = underscoreName.charAt(i);
+//                if ("_".charAt(0) == ch) {
+//                    flag = true;
+//                } else {
+//                    if (flag) {
+//                        result.append(Character.toUpperCase(ch));
+//                        flag = false;
+//                    } else {
+//                        result.append(ch);
+//                    }
+//                }
+//            }
+//        }
+//        return result.toString();
+//    }
 }

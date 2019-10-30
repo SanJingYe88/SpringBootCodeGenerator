@@ -1,26 +1,20 @@
 package com.softdev.system.generator.util;
 
-
-
 import com.softdev.system.generator.entity.ClassInfo;
-
-import java.io.IOException;
+import com.softdev.system.generator.entity.CreateInfo;
 
 /**
- * code generate tool
- *
- * @author xuxueli 2018-04-25 16:29:58
+ * 代码生成工具类
  */
 public class CodeGeneratorTool {
 
-	/**
-	 * process Table Into ClassInfo
-	 *
-	 * @param tableSql
-	 * @return
-	 */
-	public static ClassInfo processTableIntoClassInfo(String tableSql, boolean isUnderLineToCamelCase) throws IOException {
-		return TableParseUtil.processTableIntoClassInfo(tableSql, isUnderLineToCamelCase);
-	}
-
+    /**
+     * process Table Into ClassInfo
+     *
+     * @param createInfo 生成条件实体类
+     * @return ClassInfo 类的结构信息
+     */
+    public static ClassInfo processTableIntoClassInfo(CreateInfo createInfo) {
+        return TableParseUtil.processTableIntoClassInfo(createInfo);
+    }
 }

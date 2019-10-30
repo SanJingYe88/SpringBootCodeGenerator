@@ -1,6 +1,7 @@
 package com.softdev.system.generator.controller;
 
 import com.softdev.system.generator.entity.ClassInfo;
+import com.softdev.system.generator.entity.CreateInfo;
 import com.softdev.system.generator.entity.ReturnT;
 import com.softdev.system.generator.util.CodeGeneratorTool;
 import com.softdev.system.generator.util.FreemarkerTool;
@@ -8,19 +9,14 @@ import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * spring boot code generator
- * @author zhengk/moshow
- */
 @Controller
 @Slf4j
 public class IndexController {
@@ -28,37 +24,27 @@ public class IndexController {
     @Autowired
     private FreemarkerTool freemarkerTool;
 
-    @RequestMapping("/")
-    public String index() {
-        return "index";
-    }
-
-    @RequestMapping("/genCode")
+    @PostMapping("/genCode")
     @ResponseBody
-    public ReturnT<Map<String, String>> codeGenerate(String tableSql,
-                                                     //2019-2-10 liutf 修改为@RequestParam参数校验
-                                                     @RequestParam(required = false, defaultValue = "大狼狗") String authorName,
-                                                     @RequestParam(required = false, defaultValue = "com.softdev.system")String packageName,
-                                                     @RequestParam(required = false, defaultValue = "ApiReturnUtil")String returnUtil,
-                                                     @RequestParam(required = false, defaultValue = "true")boolean isUnderLineToCamelCase
-    ) {
-
-
+    public ReturnT<Map<String, String>> codeGenerate(@RequestBody CreateInfo createInfo) {
         try {
-
-            if (StringUtils.isBlank(tableSql)) {
+            if (StringUtils.isBlank(createInfo.getTableSql())) {
                 return new ReturnT<>(ReturnT.FAIL_CODE, "表结构信息不可为空");
             }
 
-            // parse table
-            ClassInfo classInfo = CodeGeneratorTool.processTableIntoClassInfo(tableSql, isUnderLineToCamelCase);
+            // 对没有设置的属性进行默认的配置
+            createInfo = CreateInfo.defaultConfig(createInfo);
+            log.info("createInfo:{}",createInfo);
+
+            // 解析 为 实体类
+            ClassInfo classInfo = CodeGeneratorTool.processTableIntoClassInfo(createInfo);
 
             // code genarete
             Map<String, Object> params = new HashMap<String, Object>();
             params.put("classInfo", classInfo);
-            params.put("authorName", authorName);
-            params.put("packageName", packageName);
-            params.put("returnUtil", returnUtil);
+            params.put("authorName", createInfo.getAuthorName());
+            params.put("packageName", createInfo.getPackageName());
+            params.put("returnUtil", createInfo.getReturnUtil());
 
             // result
             Map<String, String> result = new HashMap<String, String>();
@@ -112,7 +98,5 @@ public class IndexController {
             log.error(e.getMessage(), e);
             return new ReturnT<>(ReturnT.FAIL_CODE, "表结构解析失败"+e.getMessage());
         }
-
     }
-
 }
