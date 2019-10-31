@@ -55,6 +55,9 @@ public class TableParseUtil {
         }
         classInfo.setClassName(className);
 
+        //通过类名设置实体类的名字
+        classInfo.setEntityName(StringUtils.lowerCaseFirst(className));
+
         // 通过表名注释解析出类名注释
         String classComment = TableParseUtil.parseClassComment(className,createInfo);
         log.info("解析出类名注释:{}",classComment);
@@ -75,6 +78,12 @@ public class TableParseUtil {
         }
 
         for (FieldInfo fieldInfo : fieldList){
+
+            if(fieldInfo.getColumnInfo().isCanPrimary()){
+                tableInfo.setPrimaryKey(fieldInfo.getColumnInfo().getColumnName());
+                classInfo.setPrimaryName(StringUtils.lowerCaseFirst(fieldInfo.getFieldName()));
+                classInfo.setPrimaryType(fieldInfo.getColumnInfo().getColumnType());
+            }
             log.info("解析出的属性信息:{}",fieldInfo);
             log.info("解析出的表字段信息:{}",fieldInfo.getColumnInfo());
         }

@@ -17,6 +17,8 @@ import java.util.List;
 public class TableInfo {
 
     private String primaryKey;      //主键字段,支持联合主键
+    private String primaryType;     //主键类型
+    private String primaryCreateType;     //主键生成方式
     private String tableName;       //表名
     private String tableComment;    //表名注释
     private List<ColumnInfo> columnInfoList;  //字段列表

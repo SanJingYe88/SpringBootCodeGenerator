@@ -1,7 +1,7 @@
 import java.util.Map;
 
 /**
-* ${classInfo.classComment}
+* ${classInfo.classComment}Service 接口
 * @author ${authorName}
 * @date ${.now?string('yyyy/MM/dd')}
 */
@@ -13,9 +13,9 @@ public interface ${classInfo.className}Service {
     public ReturnT<String> insert(${classInfo.className} ${classInfo.className?uncap_first});
 
     /**
-    * 删除
-    */
-    public ReturnT<String> delete(int id);
+    * 根据主键刪除
+    **/
+    public ReturnT<String> deleteById(int ${classInfo.primaryName});
 
     /**
     * 更新
@@ -23,13 +23,32 @@ public interface ${classInfo.className}Service {
     public ReturnT<String> update(${classInfo.className} ${classInfo.className?uncap_first});
 
     /**
-    * 根據主鍵 id 查詢
+    * 根据主键查询
     */
-    public ${classInfo.className} load(int id);
+    public ${classInfo.className} queryById(int ${classInfo.primaryName});
+
+    <#--/**-->
+    <#--* 分页查询-->
+    <#--**/-->
+    <#--public List<${classInfo.className}> pageAll(int pageNum,int pageSize);-->
+
+    <#--/**-->
+    <#--* 条件查询-->
+    <#--**/-->
+    <#--public List<${classInfo.className}> query(${classInfo.className} ${classInfo.entityName});-->
 
     /**
-    * 分页查询
-    */
-    public Map<String,Object> pageList(int offset, int pagesize);
+    * 分页条件查询
+    **/
+    public List<${classInfo.className}> queryPage(${classInfo.className} ${classInfo.entityName},int pageNum,int pageSize);
 
+    /**
+    * 统计
+    **/
+    public Long countAll();
+
+    /**
+    * 条件统计
+    **/
+    public Long countAll(${classInfo.className} ${classInfo.entityName});
 }

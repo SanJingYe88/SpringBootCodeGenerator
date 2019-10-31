@@ -9,66 +9,93 @@ import java.util.List;
 import java.util.Map;
 
 /**
-* ${classInfo.classComment}
+* ${classInfo.classComment}Controller
 * @author ${authorName}
 * @date ${.now?string('yyyy/MM/dd')}
 */
+@Slf4j
 @RestController
-@RequestMapping(value = "/${classInfo.className}")
+@RequestMapping(value = "/${classInfo.className?uncap_first}")
 public class ${classInfo.className}Controller {
 
-    @Resource
+    @Autowired
     private ${classInfo.className}Service ${classInfo.className?uncap_first}Service;
 
     /**
-    * [新增]
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
-    **/
-    @RequestMapping("/insert")
-    public ReturnT<String> insert(${classInfo.className} ${classInfo.className?uncap_first}){
-        return ${classInfo.className?uncap_first}Service.insert(${classInfo.className?uncap_first});
+    * 新增
+    */
+    @PostMapping("/insert")
+    public ReturnT<String> insert(@RequestBody ${classInfo.className} ${classInfo.className?uncap_first}){
+        ${classInfo.className?uncap_first}Service.insert(${classInfo.className?uncap_first});
+        return new Result(true, StatusCode.OK, "新增成功");
     }
 
     /**
-    * [刪除]
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 根据主键刪除
     **/
-    @RequestMapping("/delete")
-    public ReturnT<String> delete(int id){
-        return ${classInfo.className?uncap_first}Service.delete(id);
+    @DeleteMapping("/{${classInfo.primaryName}}/delete")
+    public ReturnT<String> delete(@PathVariable int ${classInfo.primaryName}){
+        return ${classInfo.className?uncap_first}Service.delete(${classInfo.primaryName});
     }
 
     /**
-    * [更新]
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
-    **/
-    @RequestMapping("/update")
+    * 更新
+    */
+    @PutMapping("/{${classInfo.primaryName}}")
     public ReturnT<String> update(${classInfo.className} ${classInfo.className?uncap_first}){
-        return ${classInfo.className?uncap_first}Service.update(${classInfo.className?uncap_first});
+        ${classInfo.className?uncap_first}Service.update(${classInfo.className?uncap_first});
+        return new Result(true, StatusCode.OK, "修改成功");
     }
 
     /**
-    * [查詢] 根據主鍵 id 查詢
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
-    **/
-    @RequestMapping("/load")
-    public ReturnT<String> load(int id){
-        return ${classInfo.className?uncap_first}Service.load(id);
+    * 根据主键查询
+    */
+    @GetMapping("/{${classInfo.primaryName}}")
+    public ReturnT<String> queryById(@PathVariable int ${classInfo.primaryName}){
+        ${classInfo.className} ${classInfo.className?uncap_first} = ${classInfo.className?uncap_first}Service.queryById(${classInfo.primaryName});
+        if{${classInfo.className?uncap_first} == null}{
+            return new Result(false, StatusCode.FAIL, "查询成功",null);
+        }
+        return new Result(true, StatusCode.OK, "查询成功",${classInfo.className?uncap_first});
     }
+
+    <#--/**-->
+    <#--* 分页查询-->
+    <#--**/-->
+    <#--@RequestMapping("/page/{pageNum}/{pageSize}")-->
+    <#--public Map<String, Object> pageList(@PathVariable("pageNum") int pageNum, @PathVariable("pageSize") int pageSize) {-->
+        <#--if(pageNum == null || pageNum.trim().length == 0){-->
+            <#--pageNum = 1;-->
+        <#--}-->
+        <#--if(pageSize == null || pageSize.trim().length == 0){-->
+            <#--pageSize = 10;-->
+        <#--}-->
+        <#--Page<${classInfo.className}> data = ${classInfo.className?uncap_first}Service.pageList(pageNum, pageSize);-->
+        <#--PageResult<${classInfo.className}> pageResult = new PageResult<>(data.getTotalElements(),data.getContent());-->
+        <#--return new Result(true, StatusCode.OK, "查询成功",pageResult);-->
+    <#--}-->
+
+    <#--/**-->
+    <#--* 条件查询-->
+    <#--**/-->
+    <#--@PostMapping("/query")-->
+    <#--public ReturnT<String> query(@RequestBody ${classInfo.className} ${classInfo.className?uncap_first}){-->
+        <#--return ${classInfo.className?uncap_first}Service.query(${classInfo.className?uncap_first});-->
+    <#--}-->
 
     /**
-    * [查詢] 分頁查詢
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 分页条件查询
     **/
-    @RequestMapping("/pageList")
-    public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int offset,
-                                        @RequestParam(required = false, defaultValue = "10") int pagesize) {
-        return ${classInfo.className?uncap_first}Service.pageList(offset, pagesize);
+    @PostMapping("/query/{pageNum}/{pageSize}")
+    public ReturnT<String> query(@RequestBody(required = false) ${classInfo.className} ${classInfo.className?uncap_first}, @PathVariable("pageNum") int pageNum, @PathVariable("pageSize") int pageSize){
+        if(pageNum == null || pageNum.trim().length == 0){
+           pageNum = 1;
+        }
+        if(pageSize == null || pageSize.trim().length == 0){
+           pageSize = 10;
+        }
+        Page<${classInfo.className}> data = ${classInfo.className?uncap_first}Service.queryPage(${classInfo.className?uncap_first},pageNum, pageSize);
+        PageResult<${classInfo.className}> pageResult = new PageResult<>(data.getTotalElements(),data.getContent());
+        return new Result(true, StatusCode.OK, "查询成功",pageResult);
     }
-
 }

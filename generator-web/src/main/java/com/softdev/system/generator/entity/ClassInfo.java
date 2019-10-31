@@ -16,8 +16,11 @@ import java.util.List;
 @Accessors(chain = true)
 public class ClassInfo {
 
-    private String className;       //类名
+    private String className;       //类名(首字母大写,驼峰)
+    private String entityName;      //该类的实例的名字(类名首字母小写,驼峰)
+    private String primaryName;     //该类对应的数据表的主键的驼峰命名
+    private String primaryType;     //该类对应的数据表的主键的类型
 	private String classComment;    //类名注释
     private TableInfo tableInfo;    //类对应的数据表
-	private List<FieldInfo> fieldInfoList;  //字段列表
+	private List<FieldInfo> fieldInfoList;  //属性列表
 }

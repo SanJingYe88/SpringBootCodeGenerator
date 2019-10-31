@@ -39,8 +39,10 @@ public class IndexController {
             // 解析 为 实体类
             ClassInfo classInfo = CodeGeneratorTool.processTableIntoClassInfo(createInfo);
 
+            log.info("{}",classInfo);
+
             // code genarete
-            Map<String, Object> params = new HashMap<String, Object>();
+            Map<String, Object> params = new HashMap<>();
             params.put("classInfo", classInfo);
             params.put("tableInfo", classInfo.getTableInfo());
             params.put("authorName", createInfo.getAuthorName());
@@ -54,16 +56,19 @@ public class IndexController {
             result.put("entityByLombok", freemarkerTool.processString("code-generator/entity/entityByLombok.ftl", params));
             result.put("entitySetGet", freemarkerTool.processString("code-generator/entity/entitySetGet.ftl", params));
 
+            //MyBatis
+            result.put("mybatisXml", freemarkerTool.processString("code-generator/mybatis/mybatisXml.ftl", params));
+            result.put("mapper", freemarkerTool.processString("code-generator/mybatis/mapper.ftl", params));
+            result.put("service", freemarkerTool.processString("code-generator/mybatis/service.ftl", params));
+            result.put("serviceImpl", freemarkerTool.processString("code-generator/mybatis/serviceImpl.ftl", params));
+            result.put("controller", freemarkerTool.processString("code-generator/mybatis/controller.ftl", params));
+
 //            //UI
 //            result.put("swagger-ui", freemarkerTool.processString("code-generator/ui/swagger-ui.ftl", params));
 //            result.put("element-ui", freemarkerTool.processString("code-generator/ui/element-ui.ftl", params));
 //            result.put("bootstrap-ui", freemarkerTool.processString("code-generator/ui/bootstrap-ui.ftl", params));
 //            //mybatis old
-//            result.put("controller", freemarkerTool.processString("code-generator/mybatis/controller.ftl", params));
-//            result.put("service", freemarkerTool.processString("code-generator/mybatis/service.ftl", params));
-//            result.put("service_impl", freemarkerTool.processString("code-generator/mybatis/service_impl.ftl", params));
-//            result.put("mapper", freemarkerTool.processString("code-generator/mybatis/mapper.ftl", params));
-//            result.put("mybatis", freemarkerTool.processString("code-generator/mybatis/mybatis.ftl", params));
+//
 //
 //            //jpa
 //            result.put("entity", freemarkerTool.processString("code-generator/jpa/entity.ftl", params));

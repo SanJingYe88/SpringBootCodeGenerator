@@ -13,45 +13,47 @@ import java.util.List;
 public interface ${classInfo.className}Mapper {
 
     /**
-    * [新增]
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 新增
     **/
     int insert(${classInfo.className} ${classInfo.className?uncap_first});
 
     /**
-    * [刪除]
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 根据主键刪除
     **/
-    int delete(int id);
+    int deleteById(int ${classInfo.primaryName});
 
     /**
-    * [更新]
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 更新
     **/
     int update(${classInfo.className} ${classInfo.className?uncap_first});
 
     /**
-    * [查詢] 根據主鍵 id 查詢
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 根据主键查询
     **/
-    ${classInfo.className} load(int id);
+    ${classInfo.className} queryById(int ${classInfo.primaryName});
+
+    <#--/**-->
+    <#--* 分页查询-->
+    <#--**/-->
+    <#--List<${classInfo.className}> pageAll(int pageNum,int pageSize);-->
+
+    <#--/**-->
+    <#--* 条件查询-->
+    <#--**/-->
+    <#--List<${classInfo.className}> query(${classInfo.className} ${classInfo.entityName});-->
 
     /**
-    * [查詢] 分頁查詢
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 分页条件查询
     **/
-    List<${classInfo.className}> pageList(int offset,int pagesize);
+    List<${classInfo.className}> queryPage(${classInfo.className} ${classInfo.entityName},int pageNum,int pageSize);
 
     /**
-    * [查詢] 分頁查詢 count
-    * @author ${authorName}
-    * @date ${.now?string('yyyy/MM/dd')}
+    * 统计
     **/
-    int pageListCount(int offset,int pagesize);
+    Long countAll();
 
+    /**
+    * 条件统计
+    **/
+    Long countAll(${classInfo.className} ${classInfo.entityName});
 }
