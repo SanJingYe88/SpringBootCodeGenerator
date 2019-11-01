@@ -63,12 +63,20 @@ public class IndexController {
             result.put("serviceImpl", freemarkerTool.processString("code-generator/mybatis/serviceImpl.ftl", params));
             result.put("controller", freemarkerTool.processString("code-generator/mybatis/controller.ftl", params));
 
+            //DTO
+            result.put("entityDto", freemarkerTool.processString("code-generator/dto/entityDto.ftl", params));
+
+            //SQL
+            result.put("select", freemarkerTool.processString("code-generator/sql/select.ftl", params));
+            result.put("insert", freemarkerTool.processString("code-generator/sql/insert.ftl", params));
+            result.put("update", freemarkerTool.processString("code-generator/sql/update.ftl", params));
+            result.put("delete", freemarkerTool.processString("code-generator/sql/delete.ftl", params));
+
 //            //UI
 //            result.put("swagger-ui", freemarkerTool.processString("code-generator/ui/swagger-ui.ftl", params));
 //            result.put("element-ui", freemarkerTool.processString("code-generator/ui/element-ui.ftl", params));
 //            result.put("bootstrap-ui", freemarkerTool.processString("code-generator/ui/bootstrap-ui.ftl", params));
 //            //mybatis old
-//
 //
 //            //jpa
 //            result.put("entity", freemarkerTool.processString("code-generator/jpa/entity.ftl", params));
@@ -80,18 +88,12 @@ public class IndexController {
 //            //beetsql
 //            result.put("beetlmd", freemarkerTool.processString("code-generator/beetlsql/beetlmd.ftl", params));
 //
-//            result.put("beetlentitydto", freemarkerTool.processString("code-generator/beetlsql/beetlentitydto.ftl", params));
 //            result.put("beetlcontroller", freemarkerTool.processString("code-generator/beetlsql/beetlcontroller.ftl", params));
 //            //mybatis plus
 //            result.put("pluscontroller", freemarkerTool.processString("code-generator/mybatis-plus/pluscontroller.ftl", params));
 //            result.put("plusmapper", freemarkerTool.processString("code-generator/mybatis-plus/plusmapper.ftl", params));
 //            //util
 //            result.put("util", freemarkerTool.processString("code-generator/util/util.ftl", params));
-//            //sql generate
-//            result.put("select", freemarkerTool.processString("code-generator/sql/select.ftl", params));
-//            result.put("insert", freemarkerTool.processString("code-generator/sql/insert.ftl", params));
-//            result.put("update", freemarkerTool.processString("code-generator/sql/update.ftl", params));
-//            result.put("delete", freemarkerTool.processString("code-generator/sql/delete.ftl", params));
 
             // 计算,生成代码行数
             int lineNum = 0;

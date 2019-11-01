@@ -277,9 +277,7 @@
                         </div>
                     </div>
                     <div class="btn-group" role="group" aria-label="First group">
-                        <button type="button" class="btn btn-default generator" id="beetlentitydto">
-                            entitydto(lombok+swagger)
-                        </button>
+                        <button type="button" class="btn btn-default generator" id="entityDto">entityDto(lombok+swagger)</button>
                     </div>
                 </div>
                 <div class="btn-toolbar col-md-5" role="toolbar" aria-label="Toolbar with button groups">

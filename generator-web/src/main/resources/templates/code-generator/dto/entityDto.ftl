@@ -13,12 +13,12 @@ import java.util.List;
 @ApiModel("${classInfo.classComment}")
 public class ${classInfo.className}DTO {
 
-<#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
-<#list classInfo.fieldList as fieldItem >
-    @ApiModelProperty("${fieldItem.fieldComment}")
-    private ${fieldItem.fieldClass} ${fieldItem.fieldName};
-
+<#if classInfo.fieldInfoList?exists && classInfo.fieldInfoList?size gt 0>
+<#list classInfo.fieldInfoList as fieldInfo >
+    @ApiModelProperty("${fieldInfo.fieldComment}")
+    private ${fieldInfo.fieldClass} ${fieldInfo.fieldName};
 </#list>
+
     public ${classInfo.className}() {
     }
 </#if>
