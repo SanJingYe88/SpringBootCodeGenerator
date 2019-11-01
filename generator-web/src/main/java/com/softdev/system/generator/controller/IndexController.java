@@ -9,9 +9,10 @@ import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class IndexController {
 
             log.info("{}",classInfo);
 
-            // code genarete
+            // 填入 freeMaker 模板所需要的数据
             Map<String, Object> params = new HashMap<>();
             params.put("classInfo", classInfo);
             params.put("tableInfo", classInfo.getTableInfo());
@@ -72,6 +73,11 @@ public class IndexController {
             result.put("update", freemarkerTool.processString("code-generator/sql/update.ftl", params));
             result.put("delete", freemarkerTool.processString("code-generator/sql/delete.ftl", params));
 
+            //JdbcTemplate
+            result.put("jtdao", freemarkerTool.processString("code-generator/jdbcTemplate/dao.ftl", params));
+            result.put("jtdaoimpl", freemarkerTool.processString("code-generator/jdbcTemplate/daoImpl.ftl", params));
+
+
 //            //UI
 //            result.put("swagger-ui", freemarkerTool.processString("code-generator/ui/swagger-ui.ftl", params));
 //            result.put("element-ui", freemarkerTool.processString("code-generator/ui/element-ui.ftl", params));
@@ -82,9 +88,6 @@ public class IndexController {
 //            result.put("entity", freemarkerTool.processString("code-generator/jpa/entity.ftl", params));
 //            result.put("repository", freemarkerTool.processString("code-generator/jpa/repository.ftl", params));
 //            result.put("jpacontroller", freemarkerTool.processString("code-generator/jpa/jpacontroller.ftl", params));
-//            //jdbc template
-//            result.put("jtdao", freemarkerTool.processString("code-generator/jdbc-template/jtdao.ftl", params));
-//            result.put("jtdaoimpl", freemarkerTool.processString("code-generator/jdbc-template/jtdaoimpl.ftl", params));
 //            //beetsql
 //            result.put("beetlmd", freemarkerTool.processString("code-generator/beetlsql/beetlmd.ftl", params));
 //
@@ -108,7 +111,7 @@ public class IndexController {
             return new ReturnT<>(result);
         } catch (IOException | TemplateException e) {
             log.error(e.getMessage(), e);
-            return new ReturnT<>(ReturnT.FAIL_CODE, "表结构解析失败"+e.getMessage());
+            return new ReturnT<>(ReturnT.FAIL_CODE, "解析失败"+e.getMessage());
         }
     }
 }

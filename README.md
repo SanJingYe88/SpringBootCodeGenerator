@@ -5,6 +5,7 @@ SpringBootCodeGenerator
 <br><br>
 <table><tbody>
 <tr><td>访问路径</td> <td>http://127.0.0.1:1234</td></tr>
+<tr><td>20191101<td>对原有JdbcTemplate分类下的模板位置及结构重新编写.</td></tr>
 <tr><td>20191101<td>对原有DTO和SQL分类下的模板位置及结构重新编写.</td></tr>
 <tr><td>20191031<td>对原有Mapper分类下的模板位置及结构重新编写.1.扩展了类实体,表实体的结构信息<br/>2.可以解析出主键,主键类型,主键生成方式.</td></tr>
 <tr><td>20191030<td>1.增加了数据表实体类,表字段实体类.<br/>2.对解析SQL的逻辑进行扩展,支持联合主键,支持 NOT NULL,UNIQUE,DEFAULT 等关键字的解析.</td></tr>

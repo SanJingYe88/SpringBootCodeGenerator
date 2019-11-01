@@ -82,7 +82,7 @@ public class TableParseUtil {
             if(fieldInfo.getColumnInfo().isCanPrimary()){
                 tableInfo.setPrimaryKey(fieldInfo.getColumnInfo().getColumnName());
                 classInfo.setPrimaryName(StringUtils.lowerCaseFirst(fieldInfo.getFieldName()));
-                classInfo.setPrimaryType(fieldInfo.getColumnInfo().getColumnType());
+                classInfo.setPrimaryType(fieldInfo.getFieldClass());
             }
             log.info("解析出的属性信息:{}",fieldInfo);
             log.info("解析出的表字段信息:{}",fieldInfo.getColumnInfo());
