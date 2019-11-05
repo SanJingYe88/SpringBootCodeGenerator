@@ -22,27 +22,38 @@
 	</properties>
 
 	<dependencies>
-
-
-		<!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
-		<!--<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.6.1</version>
-		</dependency>-->
-
-
-		<!-- spring-data-jpa -->
-		<!--<dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>-->
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
     </dependencies>
 
 
@@ -61,60 +72,5 @@
 				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<skip>true</skip>
-					<compilerId>javac</compilerId>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-					<compilerVersion>1.8</compilerVersion>
-					<verbose>true</verbose>
-					<optimize>true</optimize>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.plexus</groupId>
-						<artifactId>plexus-compiler-eclipse</artifactId>
-						<version>2.2</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.0.1</version>
-				<configuration>
-					<!--<failOnMissingWebXml>false</failOnMissingWebXml>-->
-					<includeEmptyDirs>true</includeEmptyDirs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warSourceExcludes>upload/**</warSourceExcludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.0.4.RELEASE</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-
 	</build>
 </project>

@@ -5,6 +5,7 @@ SpringBootCodeGenerator
 <br><br>
 <table><tbody>
 <tr><td>访问路径</td> <td>http://127.0.0.1:1234</td></tr>
+<tr><td>20191105<td>对原有项目的SpringBoot依赖版本以及Maven插件版本重新编写.</td></tr>
 <tr><td>20191101<td>对原有JdbcTemplate分类下的模板位置及结构重新编写.</td></tr>
 <tr><td>20191101<td>对原有DTO和SQL分类下的模板位置及结构重新编写.</td></tr>
 <tr><td>20191031<td>对原有Mapper分类下的模板位置及结构重新编写.1.扩展了类实体,表实体的结构信息<br/>2.可以解析出主键,主键类型,主键生成方式.</td></tr>

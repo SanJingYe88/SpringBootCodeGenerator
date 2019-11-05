@@ -8,12 +8,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.7.RELEASE</version>
-	</parent>
-
 	<modules>
 		<module>generator-web</module>
 	</modules>
@@ -23,128 +17,93 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- 指定jdk版本 -->
 		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.2.60</version>
-		</dependency>
-		<!-- 支持 @ConfigurationProperties 注解 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<!-- Hutool超级工具类 http://hutool.mydoc.io/ -->
-		<dependency>
-			<groupId>cn.hutool</groupId>
-			<artifactId>hutool-all</artifactId>
-			<version>4.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-freemarker</artifactId>
-		</dependency>
-		
-		<!-- java.lang.ClassNotFoundException: javax.xml.bind.JAXBException/javax.xml.bind.annotation.XmlType问题解决 -->
-		<!--<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
-		</dependency>-->
-	</dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>2.0.3.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>2.0.3.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.60</version>
+            </dependency>
+            <!-- 支持 @ConfigurationProperties 注解 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <optional>true</optional>
+                <version>2.0.3.RELEASE</version>
+            </dependency>
+            <!-- Hutool超级工具类 http://hutool.mydoc.io/ -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>4.6.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.16.20</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-freemarker</artifactId>
+                <version>2.0.3.RELEASE</version>
+            </dependency>
+
+            <!-- java.lang.ClassNotFoundException: javax.xml.bind.JAXBException/javax.xml.bind.annotation.XmlType问题解决 -->
+            <!--<dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>2.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>2.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>1.1.1</version>
+            </dependency>-->
+        </dependencies>
+
+    </dependencyManagement>
 
 	<build>
-		<!--解决idea打包没有xml-->
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-				</includes>
-				<filtering>false</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
+		<!--打包出的 jar 包的名字-->
+		<finalName>GeneratorWebApplication</finalName>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<skip>true</skip>
-					<compilerId>javac</compilerId>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-					<compilerVersion>1.8</compilerVersion>
-					<verbose>true</verbose>
-					<optimize>true</optimize>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.plexus</groupId>
-						<artifactId>plexus-compiler-eclipse</artifactId>
-						<version>2.2</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.0.1</version>
-				<configuration>
-					<!--<failOnMissingWebXml>false</failOnMissingWebXml>-->
-					<includeEmptyDirs>true</includeEmptyDirs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warSourceExcludes>upload/**</warSourceExcludes>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.0.4.RELEASE</version>
+				<version>2.0.6.RELEASE</version>
+				<!--这里写上main方法所在类的路径-->
+				<configuration>
+					<mainClass>com.softdev.system.generator.GeneratorWebApplication</mainClass>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -153,18 +112,36 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<!--可以通过setting中可以修改JavaCompiler版本和在Project Structure可以修改LanguageLevel.
+                但是一旦Maven项目有变化，甚至刷新一下pom.xml，IDEA会重置这些配置.
+                解决办法：在pom.xml中指定maven-compiler-plugin的版本，该版本会同时影响LanguageLevel和JavaCompiler，修改后默认就成了这里设置的版本。
+                -->
+				<!--在多模块工程下，在父工程下执行的插件默认会在其所有的子模块上也执行-->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
 		</plugins>
-
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.yml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.yml</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/libs-milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>
